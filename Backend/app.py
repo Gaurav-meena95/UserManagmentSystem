@@ -15,7 +15,6 @@ def index():
 
 @app.route('/users',methods=['GET','POST'])
 def data():
-    print('fjdsgjdf')
     if request.method =="POST":
         body = request.json
         firstName = body['firstName']
@@ -79,9 +78,36 @@ def oneUserData(id):
         return jsonify(dataDict)
     
     if request.method == 'DELETE':
+        exsting = db['users'].find_one({'_id' : ObjectId(id)})
+        if (not exsting):
+            return jsonify({'message':'User does not exits'})
         db['users'].delete_one({'_id':ObjectId(id)})
 
         return jsonify({"Messge":f'The user with the {id} is deleted'})
+    
+    if request.method =="PUT":
+        body = request.json
+        firstName = body['firstName']
+        lastName = body['lastName']
+        emailId = body['emailId']
+        
+        db['users'].update_one(
+        {"_id": ObjectId(id)},   
+        {
+            "$set": {
+                "firstName": firstName,
+                "lastName": lastName,
+                "emailId": emailId
+            }
+        }
+        )
+
+    return jsonify({
+        "status": "Data successfully updated in MongoDB",
+        "firstName": firstName,
+        "lastName": lastName,
+        "emailId": emailId
+    })
 
 
     
