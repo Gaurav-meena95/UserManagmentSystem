@@ -45,7 +45,7 @@ function UserManagementApp() {
   };
 
   const openUpdate = (user) => {
-    setForm({ firstName: user.firstName, lastName: user.lastName, email: user.email });
+    setForm({ firstName: user.firstName, lastName: user.lastName});
     setSelectedUser(user);
     setModalMode("update");
     setShowModal(true);
@@ -74,6 +74,7 @@ function UserManagementApp() {
     try {
       setLoading(true)
       if (modalMode === "add") {
+        console.log(form)
         await createUser(form)
       } else if (modalMode === "update") {
         await updateUser(selectedUser.id, form)
@@ -82,7 +83,7 @@ function UserManagementApp() {
       setShowModal(false);
     } catch (error) {
       console.error("Error saving user:", error);
-      alert("Could not save user!");
+      alert(error?.response?.data?.message || "Something went wrong");
     }
 
   };
