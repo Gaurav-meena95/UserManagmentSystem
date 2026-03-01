@@ -28,7 +28,7 @@ export function UserTable({ users, darkMode, onUpdate, onDelete, onView }) {
               <td className={`px-6 py-4 ${darkMode ? "text-gray-200" : "text-gray-700"}`}>{user.lastName}</td>
               <td className={`px-6 py-4 ${darkMode ? "text-blue-400" : "text-blue-600"}`}>{user.email}</td>
               <td className="px-6 py-4">
-                <div className="flex gap-2">
+                <div className="flex gap-2 ">
                   <button
                     onClick={() => onUpdate(user)}
                     className="bg-teal-500 hover:bg-teal-400 text-white px-4 py-1.5 rounded text-sm font-medium transition shadow-sm"

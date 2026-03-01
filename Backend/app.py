@@ -19,9 +19,10 @@ def data():
         body = request.json
         firstName = body['firstName']
         lastName = body['lastName']
-        emailId = body['emailId']
+        email = body['email']
+        print('dkjbsbk',email,firstName)
 
-        exsting = db['users'].find_one({'emailId':emailId})
+        exsting = db['users'].find_one({'email':email})
 
         if (exsting):
             return jsonify({'message':'user already exist with this email'})
@@ -30,14 +31,14 @@ def data():
         db['users'].insert_one({
             "firstName" :firstName,
             "lastName" :lastName,
-            "emailId" :emailId
+            "email" :email
         })
 
         return jsonify({
             "status":'Data is succesfully insert in to mongoDB',
             "firstName" :firstName,
             "lastName" :lastName,
-            "emailId" :emailId
+            "email" :email
         })
     
     if request.method == "GET":
@@ -47,13 +48,13 @@ def data():
             id = data['_id']
             firstName = data['firstName']
             lastName = data['lastName']
-            emailId = data['emailId']
+            email = data['email']
 
             dataDict = {
                 "id" :str(id),
                 "firstName" :firstName,
                 "lastName" :lastName,
-                "emailId" :emailId
+                "email" :email
             }
             dataJson.append(dataDict)
         return jsonify(dataJson)
@@ -67,13 +68,13 @@ def oneUserData(id):
         id = data['_id']
         firstName = data['firstName']
         lastName = data['lastName']
-        emailId = data['emailId']
+        email = data['email']
 
         dataDict = {
             "id" :str(id),
             "firstName" :firstName,
             "lastName" :lastName,
-            "emailId" :emailId
+            "email" :email
             }
         return jsonify(dataDict)
     
@@ -89,7 +90,7 @@ def oneUserData(id):
         body = request.json
         firstName = body['firstName']
         lastName = body['lastName']
-        emailId = body['emailId']
+        email = body['email']
         
         db['users'].update_one(
         {"_id": ObjectId(id)},   
@@ -97,7 +98,7 @@ def oneUserData(id):
             "$set": {
                 "firstName": firstName,
                 "lastName": lastName,
-                "emailId": emailId
+                "email": email
             }
         }
         )
@@ -106,7 +107,7 @@ def oneUserData(id):
         "status": "Data successfully updated in MongoDB",
         "firstName": firstName,
         "lastName": lastName,
-        "emailId": emailId
+        "email": email
     })
 
 

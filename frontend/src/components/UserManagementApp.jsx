@@ -1,29 +1,44 @@
 
 
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useState,useEffect } from "react";
+import { Navbar } from "./Navbar";
 import { UserTable } from "./Usertable";
 import { UserModal } from "./Usermodal";
+import { createUser, deleteUser, getAlluser, updateUser } from "../services/userService";
 
 
 
 function UserManagementApp() {
 
-  const initialUsers = [
-  { id: 1, firstName: "Gautam", lastName: "Sharma", email: "geekygautam1997@gmail.com" },
-  { id: 2, firstName: "Tim", lastName: "Southee", email: "TimSouthee@gmail.com" },
-  { id: 3, firstName: "Kane", lastName: "Williamson", email: "kane@gmail.com" },
-  { id: 4, firstName: "Martin", lastName: "Guptill", email: "Marin@gmail.com" },
-];
-
-  const [users, setUsers] = useState(initialUsers);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false)
   const [modalMode, setModalMode] = useState("add");
   const [selectedUser, setSelectedUser] = useState(null);
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "" });
   const [darkMode, setDarkMode] = useState(true);
+  const [users, setUsers] = useState([]);
 
-  const openAdd = () => {
+  useEffect(() => {
+    fetchAlluser();
+  }, []);
+
+  const fetchAlluser = async () => {
+    try {
+      setLoading(true)
+      const data = await getAlluser()
+      setUsers(data)
+
+    } catch (error) {
+      console.log(error)
+      alert('Could not load users. Is Flask running?')
+
+    }
+    finally {
+      setLoading(false)
+    }
+  }
+
+  const addnewUser = () => {
     setForm({ firstName: "", lastName: "", email: "" });
     setModalMode("add");
     setShowModal(true);
@@ -42,23 +57,40 @@ function UserManagementApp() {
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
-    setUsers(users.filter((u) => u.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deleteUser(id);
+      await fetchAlluser()
+    } catch (error) {
+      console.error("Error deleting:", error);
+      alert("Could not delete user!");
+    }
+
   };
 
-  const handleSubmit = () => {
-    if (modalMode === "add") {
-      setUsers([...users, { id: Date.now(), ...form }]);
-    } else if (modalMode === "update") {
-      setUsers(users.map((u) => (u.id === selectedUser.id ? { ...u, ...form } : u)));
+
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true)
+      if (modalMode === "add") {
+        await createUser(form)
+      } else if (modalMode === "update") {
+        await updateUser(selectedUser.id, form)
+      }
+      await fetchAlluser()
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error saving user:", error);
+      alert("Could not save user!");
     }
-    setShowModal(false);
+
   };
 
   return (
     <div className={`min-h-screen font-sans transition-colors duration-300 ${darkMode ? "bg-gray-950" : "bg-gray-100"}`}>
-      
-      <NavLink darkMode={darkMode} onToggle={() => setDarkMode(!darkMode)} />
+
+      <Navbar darkMode={darkMode} onToggle={() => setDarkMode(!darkMode)} />
 
       <div className="max-w-5xl mx-auto mt-10 px-4">
         <h2 className={`text-3xl font-bold text-center mb-6 ${darkMode ? "text-white" : "text-gray-800"}`}>
@@ -66,10 +98,9 @@ function UserManagementApp() {
         </h2>
 
         <button
-          onClick={openAdd}
-          className={`mb-6 font-medium px-5 py-2 rounded transition text-white ${
-            darkMode ? "bg-blue-600 hover:bg-blue-500" : "bg-blue-500 hover:bg-blue-600"
-          }`}
+          onClick={addnewUser}
+          className={`mb-6 font-medium px-5 py-2 rounded transition text-white ${darkMode ? "bg-blue-600 hover:bg-blue-500" : "bg-blue-500 hover:bg-blue-600"
+            }`}
         >
           + Add User
         </button>
